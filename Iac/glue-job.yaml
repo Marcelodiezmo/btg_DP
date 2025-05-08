@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Glue Job para procesamiento de transacciones
+
+Parameters:
+  ScriptS3Path:
+    Type: String
+    Description: Ruta al script de Glue en S3 (por ejemplo, s3://.../transacciones.py)
+  JobName:
+    Type: String
+    Description: Nombre del Glue Job
+
+Resources:
+  GlueJobTransacciones:
+    Type: AWS::Glue::Job
+    Properties:
+      Name: !Ref JobName
+      Role: arn:aws:iam::913404505393:role/glue-pdn
+      Command:
+        Name: glueetl
+        ScriptLocation: !Ref ScriptS3Path
+        PythonVersion: 3
+      GlueVersion: "4.0"
+      MaxRetries: 0
+      Timeout: 10
+      NumberOfWorkers: 2
+      WorkerType: G.1X
+      DefaultArguments:
+        "--TempDir": "s3://aws-glue-assets-913404505393-us-east-1/temporary/"
+        "--enable-metrics": "true"
+        "--enable-continuous-cloudwatch-log": "true"
+        "--enable-spark-ui": "true"
+        "--spark-event-logs-path": "s3://aws-glue-assets-913404505393-us-east-1/sparkHistoryLogs/"
+        "--extra-py-files": "s3://aws-glue-assets-913404505393-us-east-1/scripts/extra/extra-0.1.0-py3-none-any.whl"
+
+
+# aws cloudformation deploy \
+#   --template-file glue-job.yaml \
+#   --stack-name glue-job-transacciones \
+#   --capabilities CAPABILITY_NAMED_IAM \
+#   --parameter-overrides \
+#     ScriptS3Path=s3://aws-glue-assets-913404505393-us-east-1/scripts/co_transacciones.py \
+#     JobName=glue-job-transacciones
+
+
+
+# aws cloudformation deploy \
+#   --template-file glue-job.yaml \
+#   --stack-name glue-job-clientes \
+#   --capabilities CAPABILITY_NAMED_IAM \
+#   --parameter-overrides \
+#     ScriptS3Path=s3://aws-glue-assets-913404505393-us-east-1/scripts/co_clientes.py \
+#     JobName=glue-job-clientes
+
+
+# aws cloudformation deploy \
+#   --template-file glue-job.yaml \
+#   --stack-name glue-job-provedores \
+#   --capabilities CAPABILITY_NAMED_IAM \
+#   --parameter-overrides \
+#     ScriptS3Path=s3://aws-glue-assets-913404505393-us-east-1/scripts/co_proveedores.py \
+#     JobName=glue-job-proveedores
