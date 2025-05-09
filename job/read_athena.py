@@ -103,7 +103,6 @@ def main() -> None:
     WHERE c.nombre IS NOT NULL
     ORDER BY
         t.fecha DESC
-    LIMIT 100;
     '''
 
     execution_id = query_athena(query, DATABASE, S3_OUTPUT, REGION)
